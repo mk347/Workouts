@@ -1,0 +1,20 @@
+riQ5Dz5hvr3P+Hwml5+Kzw==cEOcPvoWDLKxMqy6
+
+
+
+$.ajax({
+    method: 'GET',
+    url: 'https://api.api-ninjas.com/v1/exercises?muscle=' + muscle,
+    headers: { 'X-Api-Key': 'riQ5Dz5hvr3P+Hwml5+Kzw==cEOcPvoWDLKxMqy6'},
+    contentType: 'application/json',
+    success: function(result) {
+        console.log(result);
+    },
+    error: function ajaxError(jqXHR) {
+        console.error('Error: ', jqXHR.responseText);
+    }
+});
+
+
+curl https://api.api-ninjas.com/v1/exercises \
+    -H "X-Api-Key: riQ5Dz5hvr3P+Hwml5+Kzw==cEOcPvoWDLKxMqy6"
