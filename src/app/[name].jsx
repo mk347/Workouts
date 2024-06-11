@@ -1,15 +1,41 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 // import ExerciseListItem from './components/ExerciseListItem';
 import exercises from '../../assets/data/exercises.json';
+import { useQuery } from '@tanstack/react-query';
+import { gql } from 'graphql-request';
+import client from '../graphql/graphqlClient';
+
+const exerciseQuery = gql`
+    query exercises($name: String) {
+        exercises(name: $name) {
+            name
+            muscle
+            instructions
+            equipment
+        }
+    }
+`;
 
 const ExerciseDetailsScreen = () => {
+    const { name } = useLocalSearchParams();
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['exercises', name],
+        queryFn: () => client.request(exerciseQuery, {name}),
+    });
+
     const [isInstructionExpanded, setIsInstructionExpanded] = useState(false);
 
-    const params = useLocalSearchParams();
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
 
-    const exercise = exercises.find((item) => item.name === params.name);
+    if (error) {
+        return console.log(error.message);
+    }
+
+    const exercise = data.exercises[0];
 
     // might break
     !exercise && <Text>Exercise not found.</Text>;
@@ -29,7 +55,7 @@ const ExerciseDetailsScreen = () => {
                     {exercise.instructions}
                 </Text>
                 <Text onPress={() => setIsInstructionExpanded((v) => !v)} style={styles.seeMore}>
-                     {isInstructionExpanded ? 'See less' : 'See more'}
+                    {isInstructionExpanded ? 'See less' : 'See more'}
                 </Text>
             </View>
         </ScrollView>
